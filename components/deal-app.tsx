@@ -2,7 +2,7 @@
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Calculator, Camera, Hammer, Home, MapPinned, Plus, Settings, ShieldCheck, Trash2 } from "lucide-react";
+import { Calculator, Camera, Download, Hammer, Home, MapPinned, Plus, Settings, ShieldCheck, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 import { InviteDialog } from "@/components/invite-dialog";
 import { CompsTable } from "@/components/comps-table";
@@ -160,6 +160,17 @@ export default function DealApp({ isAdmin = false }: { isAdmin?: boolean }) {
             <Button variant="ghost" size="icon-lg" aria-label="Delete deal" onClick={remove}>
               <Trash2 />
             </Button>
+            {deal && (
+              <a
+                href={`/api/deals/${deal.id}/pdf`}
+                download
+                className="inline-flex items-center justify-center rounded-lg border border-input bg-background h-9 w-9 hover:bg-muted transition-colors"
+                aria-label="Export PDF"
+                title="Export deal as PDF"
+              >
+                <Download className="size-4" />
+              </a>
+            )}
             <Link
               href="/app/settings"
               className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
