@@ -1,10 +1,13 @@
-import { Building2 } from "lucide-react";
+export function BrandMark({ size = "md" }: { size?: "sm" | "md" }) {
+  const box = size === "sm" ? "size-7" : "size-9";
+  const icon = size === "sm" ? 14 : 18;
 
-export function BrandMark() {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground">
-        <Building2 className="size-5" />
+      <div className={`${box} grid place-items-center rounded-lg bg-[#0d1f17] shrink-0`}>
+        <svg width={icon} height={icon} viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L2 9h2v9h4v-5h4v5h4V9h2L10 2z" fill="white" />
+        </svg>
       </div>
       <div className="leading-tight">
         <p className="font-semibold tracking-tight">DomiComp AI</p>
