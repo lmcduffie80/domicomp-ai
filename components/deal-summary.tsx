@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,9 +46,10 @@ export function DealSummary({ deal, update, compact = false }: { deal: Deal; upd
         )}
 
         <div className={compact ? "grid gap-3" : "grid gap-3 sm:grid-cols-2"}>
-          <Field label="Purchase / asking price" value={deal.settings.purchasePrice || ""} onChange={(v) => set({ purchasePrice: v })} />
+          <Field label="Purchase / asking price" value={deal.settings.purchasePrice || ""} format={money} onChange={(v) => set({ purchasePrice: v })} />
           <Field
             label="ARV override"
+            format={money}
             placeholder={money(deal.compAnalysis?.arvMid ?? deal.avm?.price ?? 0)}
             value={deal.settings.arvOverride ?? ""}
             onChange={(v) => set({ arvOverride: v || null })}
@@ -105,16 +107,34 @@ function Field({
   value,
   onChange,
   placeholder,
+  format,
 }: {
   label: string;
   value: number | string;
   onChange: (v: number) => void;
   placeholder?: string;
+  format?: (v: number) => string;
 }) {
+  const [editing, setEditing] = useState(false);
+  const showFormatted = format && !editing && value !== "" && value != null;
+
   return (
     <div className="grid gap-1.5">
       <Label className="text-xs">{label}</Label>
-      <Input type="number" min={0} inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(Number(e.target.value))} />
+      {showFormatted ? (
+        <Input type="text" readOnly value={format(Number(value))} onFocus={() => setEditing(true)} onClick={() => setEditing(true)} />
+      ) : (
+        <Input
+          type="number"
+          min={0}
+          inputMode="decimal"
+          value={value}
+          placeholder={placeholder}
+          autoFocus={editing}
+          onBlur={() => setEditing(false)}
+          onChange={(e) => onChange(Number(e.target.value))}
+        />
+      )}
     </div>
   );
 }
