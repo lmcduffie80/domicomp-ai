@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <p>
             Your deal data, photos, and account information are retained as long as your account is active. You may
             delete your account and associated data at any time by contacting us at{" "}
-            <a href="mailto:support@domicomp.ai" className="text-green-700 underline">support@domicomp.ai</a>.
+            <a href="mailto:support@domicomp-ai.com" className="text-green-700 underline">support@domicomp-ai.com</a>.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function PrivacyPage() {
           <p>
             Depending on your location, you may have rights to access, correct, or delete your personal data.
             To exercise these rights, contact us at{" "}
-            <a href="mailto:support@domicomp.ai" className="text-green-700 underline">support@domicomp.ai</a>.
+            <a href="mailto:support@domicomp-ai.com" className="text-green-700 underline">support@domicomp-ai.com</a>.
           </p>
         </div>
 
@@ -112,8 +112,8 @@ export default function PrivacyPage() {
           <p>
             Agrovus LLC<br />
             DomiComp AI<br />
-            <a href="mailto:support@domicomp.ai" className="text-green-700 underline">support@domicomp.ai</a><br />
-            <a href="https://domicomp.ai" className="text-green-700 underline">https://domicomp.ai</a>
+            <a href="mailto:support@domicomp-ai.com" className="text-green-700 underline">support@domicomp-ai.com</a><br />
+            <a href="https://domicomp-ai.com" className="text-green-700 underline">https://domicomp-ai.com</a>
           </p>
         </div>
       </section>
