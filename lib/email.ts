@@ -2,8 +2,8 @@ import "server-only";
 import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_ADDRESS = process.env.RESEND_FROM ?? "invites@invites.oldvineproperties.com";
-const REPLY_TO = process.env.RESEND_REPLY_TO ?? "info@oldvineproperties.com";
+const FROM_ADDRESS = process.env.RESEND_FROM ?? "invites@domicomp-ai.com";
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? "info@domicomp-ai.com";
 
 function resendClient() {
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set");

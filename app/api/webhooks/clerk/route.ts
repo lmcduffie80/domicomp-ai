@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     console.info("[clerk-webhook]", evt.type);
 
     // Forward every email Clerk generates through Resend so they arrive from
-    // @invites.oldvineproperties.com instead of @accounts.dev.
+    // @domicomp-ai.com instead of @accounts.dev.
     // Requires "Delivered by Clerk" to be OFF for each template in the Clerk Dashboard.
     if (evt.type === "email.created") {
       const { to_email_address, subject, body } = evt.data as {
