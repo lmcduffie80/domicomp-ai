@@ -57,8 +57,12 @@ export function DealScreen() {
 
   useEffect(() => {
     setLoading(true);
-    loadDeals().finally(() => setLoading(false));
-  }, [loadDeals]);
+    loadDeals().then(async (list) => {
+      // Auto-open the most recent deal that has an address set
+      const best = list.find(d => d.address?.trim()) ?? list[0];
+      if (best) await openDeal(best.id);
+    }).finally(() => setLoading(false));
+  }, [loadDeals, openDeal]);
 
   async function newDeal() {
     const { deal: d } = await call(a => a.deals.create());
