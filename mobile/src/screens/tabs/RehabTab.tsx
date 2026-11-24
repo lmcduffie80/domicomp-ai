@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Deal, RehabLine } from "@/lib/schemas";
 import { rehabTotals } from "@/lib/calc";
-import { money } from "@/lib/format";
+import { money, moneyCents } from "@/lib/format";
 import { uid } from "@/lib/uid";
 
 interface Props {
@@ -193,7 +193,7 @@ export function RehabTab({ deal, onChange, onSave, api }: Props) {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-900 text-sm">{money(line.unitPrice * line.quantity)}</p>
-                        <p className="text-xs text-gray-400">{money(line.unitPrice)}/{line.unit}</p>
+                        <p className="text-xs text-gray-400">{moneyCents(line.unitPrice)}/{line.unit}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-2">
