@@ -2,7 +2,7 @@
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Calculator, Camera, Hammer, Home, MapPinned, Plus, Trash2 } from "lucide-react";
+import { Calculator, Camera, Hammer, Home, MapPinned, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 import { InviteDialog } from "@/components/invite-dialog";
 import { CompsTable } from "@/components/comps-table";
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { postJson } from "@/lib/format";
 import type { Deal } from "@/lib/schemas";
+import Link from "next/link";
 
 const TABS = [
   { id: "property", label: "Property", icon: Home },
@@ -29,7 +30,7 @@ type TabId = (typeof TABS)[number]["id"];
 type DealListItem = { id: string; address: string; updatedAt: number };
 type Usage = { used: number; limit: number; plan: string; comped: boolean };
 
-export default function DealApp() {
+export default function DealApp({ isAdmin = false }: { isAdmin?: boolean }) {
   const [deal, setDeal] = useState<Deal | null>(null);
   const [deals, setDeals] = useState<DealListItem[]>([]);
   const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
@@ -159,6 +160,14 @@ export default function DealApp() {
             <Button variant="ghost" size="icon-lg" aria-label="Delete deal" onClick={remove}>
               <Trash2 />
             </Button>
+            {isAdmin && (
+              <Link
+                href="/app/admin"
+                className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <ShieldCheck className="size-3.5" /> Admin
+              </Link>
+            )}
             <UserButton />
           </div>
         </div>
