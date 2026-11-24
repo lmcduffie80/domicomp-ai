@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useOrganization, useClerk } from "@clerk/clerk-react";
+import { useOrganization, useClerk } from "@clerk/react";
 import { Home, Camera, MapPinned, Hammer, Calculator, Plus, ChevronLeft, LogOut, Building2 } from "lucide-react";
 import { api, type DealListItem } from "@/lib/api";
 

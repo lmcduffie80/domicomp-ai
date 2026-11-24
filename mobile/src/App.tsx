@@ -1,4 +1,4 @@
-import { useAuth, useOrganization } from "@clerk/clerk-react";
+import { useAuth, useOrganization } from "@clerk/react";
 import { SignInScreen } from "@/screens/SignInScreen";
 import { OrgPickerScreen } from "@/screens/OrgPickerScreen";
 import { DealScreen } from "@/screens/DealScreen";
