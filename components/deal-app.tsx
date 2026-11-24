@@ -4,6 +4,7 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Calculator, Camera, Hammer, Home, MapPinned, Plus, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
+import { InviteDialog } from "@/components/invite-dialog";
 import { CompsTable } from "@/components/comps-table";
 import { DealChat } from "@/components/deal-chat";
 import { DealSummary } from "@/components/deal-summary";
@@ -137,6 +138,7 @@ export default function DealApp() {
                 {usage.comped ? " · Founder" : ` · ${usage.plan}`}
               </span>
             )}
+            <InviteDialog />
             <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/app" afterCreateOrganizationUrl="/app" />
             <select
               aria-label="Saved deals"
