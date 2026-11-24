@@ -13,9 +13,9 @@ export default function PrivacyPage() {
         <div>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">1. Introduction</h2>
           <p>
-            DomiComp AI ("we," "our," or "us") is operated by Agrovus LLC. This Privacy Policy explains how we collect,
+            DomiComp AI (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) is operated by Agrovus LLC. This Privacy Policy explains how we collect,
             use, and protect your information when you use the DomiComp AI mobile application and web platform
-            (collectively, the "Service").
+            (collectively, the &ldquo;Service&rdquo;).
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
         <div>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">4. Camera and Photo Library Access</h2>
           <p>
-            DomiComp AI requests access to your device's camera and photo library solely to allow you to capture and
+            DomiComp AI requests access to your device&rsquo;s camera and photo library solely to allow you to capture and
             upload property photos for deal analysis. Photos are uploaded to secure cloud storage and processed by our
             AI system. We do not share your photos with third parties except as required to provide the Service.
           </p>
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">8. Children's Privacy</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">8. Children&rsquo;s Privacy</h2>
           <p>
             DomiComp AI is not directed to children under 13. We do not knowingly collect personal information
             from children under 13.
