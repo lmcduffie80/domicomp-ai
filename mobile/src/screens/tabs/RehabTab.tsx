@@ -193,7 +193,7 @@ export function RehabTab({ deal, onChange, onSave, api }: Props) {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-900 text-sm">{money(line.unitPrice * line.quantity)}</p>
-                        <p className="text-xs text-gray-400">{moneyCents(line.unitPrice)}/{line.unit}</p>
+                        <p className="text-xs text-gray-400">{Number.isInteger(line.unitPrice) ? money(line.unitPrice) : moneyCents(line.unitPrice)}/{line.unit}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-2">
