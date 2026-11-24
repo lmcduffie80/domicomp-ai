@@ -33,6 +33,7 @@ export function DealScreen() {
   const [tab, setTab]           = useState<TabId>("property");
   const [view, setView]         = useState<"list" | "deal">("list");
   const [loading, setLoading]   = useState(true);
+  const [listError, setListError] = useState<string | null>(null);
   const apiRef = useRef<ReturnType<typeof makeApi> | null>(null);
 
   /* Keep a live api instance so tabs can call it synchronously */
@@ -41,11 +42,17 @@ export function DealScreen() {
   });
 
   const loadDeals = useCallback(async () => {
+    setListError(null);
     try {
       const res = await call(a => a.deals.list());
       setDeals(res.deals);
       return res.deals;
-    } catch (e) { console.error(e); return []; }
+    } catch (e) {
+      const msg = (e as Error).message ?? "Unknown error";
+      console.error("loadDeals:", msg);
+      setListError(msg);
+      return [];
+    }
   }, [call]);
 
   useEffect(() => {
@@ -134,7 +141,20 @@ export function DealScreen() {
             </button>
           </div>
 
-          {deals.length === 0 ? (
+          {listError && (
+            <div className="mb-4 rounded-2xl bg-red-50 border border-red-100 p-4">
+              <p className="text-xs font-semibold text-red-600 mb-1">⚠ Could not load deals</p>
+              <p className="text-xs text-red-700 font-mono break-all">{listError}</p>
+              <button
+                onClick={() => { setLoading(true); loadDeals().finally(() => setLoading(false)); }}
+                className="mt-3 text-xs font-semibold text-red-600 underline"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!listError && deals.length === 0 && (
             <div className="mt-16 text-center px-6">
               <div className="mx-auto mb-4 grid size-20 place-items-center rounded-3xl bg-green-50">
                 <Home className="size-9 text-green-700" />
@@ -144,7 +164,9 @@ export function DealScreen() {
                 Tap "New Deal" to analyze your first investment property
               </p>
             </div>
-          ) : (
+          )}
+
+          {!listError && deals.length > 0 && (
             <div className="space-y-2">
               {deals.map((d) => (
                 <button
