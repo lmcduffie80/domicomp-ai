@@ -39,7 +39,9 @@ function NumberCard({ label, value, sub, positive, highlight }: { label: string;
   );
 }
 
-function SettingRow({ label, value, onChange }: { label: string; value: number | null; onChange: (v: number | null) => void }) {
+const pct = (v: number) => `${v}%`;
+
+function SettingRow({ label, value, onChange, format = String }: { label: string; value: number | null; onChange: (v: number | null) => void; format?: (v: number) => string }) {
   const [editing, setEditing] = useState(false);
   const [raw, setRaw] = useState(value != null ? String(value) : "");
 
@@ -63,7 +65,7 @@ function SettingRow({ label, value, onChange }: { label: string; value: number |
         />
       ) : (
         <button onClick={() => { setRaw(value != null ? String(value) : ""); setEditing(true); }} className="text-sm font-medium text-green-700 underline underline-offset-2">
-          {value != null ? value : "—"}
+          {value != null ? format(value) : "—"}
         </button>
       )}
     </div>
@@ -134,12 +136,12 @@ export function SummaryTab({ deal, onChange, onSave, api }: Props) {
         {/* Settings */}
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Deal Settings</p>
-          <SettingRow label="Purchase Price" value={deal.settings.purchasePrice || null} onChange={v => updateSettings({ purchasePrice: v ?? 0 })} />
-          <SettingRow label="ARV Override ($)" value={deal.settings.arvOverride} onChange={v => updateSettings({ arvOverride: v })} />
-          <SettingRow label="MAO %" value={deal.settings.maoPct} onChange={v => updateSettings({ maoPct: v ?? 70 })} />
-          <SettingRow label="Closing/Holding %" value={deal.settings.closingHoldingPct} onChange={v => updateSettings({ closingHoldingPct: v ?? 10 })} />
-          <SettingRow label="Labor Multiplier" value={deal.settings.laborMultiplier} onChange={v => updateSettings({ laborMultiplier: v ?? 1 })} />
-          <SettingRow label="Contingency %" value={deal.settings.contingencyPct} onChange={v => updateSettings({ contingencyPct: v ?? 10 })} />
+          <SettingRow label="Purchase Price" value={deal.settings.purchasePrice || null} format={money} onChange={v => updateSettings({ purchasePrice: v ?? 0 })} />
+          <SettingRow label="ARV Override" value={deal.settings.arvOverride} format={money} onChange={v => updateSettings({ arvOverride: v })} />
+          <SettingRow label="MAO %" value={deal.settings.maoPct} format={pct} onChange={v => updateSettings({ maoPct: v ?? 70 })} />
+          <SettingRow label="Closing/Holding %" value={deal.settings.closingHoldingPct} format={pct} onChange={v => updateSettings({ closingHoldingPct: v ?? 10 })} />
+          <SettingRow label="Labor Multiplier" value={deal.settings.laborMultiplier} format={v => `${v}×`} onChange={v => updateSettings({ laborMultiplier: v ?? 1 })} />
+          <SettingRow label="Contingency %" value={deal.settings.contingencyPct} format={pct} onChange={v => updateSettings({ contingencyPct: v ?? 10 })} />
         </div>
 
         {/* Chat messages */}
