@@ -77,6 +77,8 @@
 	<key>WKAppBoundDomains</key>
 	<array>
 		<string>domicomp-ai.com</string>
+		<string>clerk.domicomp-ai.com</string>
+		<string>accounts.dev</string>
 	</array>
 </dict>
 </plist>

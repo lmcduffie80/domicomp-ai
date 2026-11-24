@@ -3,16 +3,14 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const config: CapacitorConfig = {
   appId: "com.agrovus.domicompai",
   appName: "DomiComp AI",
-  // Load the live production URL — API routes, auth, and DB all stay on Vercel
-  server: {
-    url: "https://domicomp-ai.com",
-    cleartext: false,
-  },
+  webDir: "www", // Vite builds mobile/src → www/
+  // Dev only: uncomment below to point at local Vite dev server for hot reload
+  // server: { url: "http://192.168.x.x:5173", cleartext: true },
   ios: {
     contentInset: "automatic",
     backgroundColor: "#ffffff",
     scrollEnabled: false,
-    limitsNavigationsToAppBoundDomains: true,
+    limitsNavigationsToAppBoundDomains: false,
     allowsLinkPreview: false,
   },
   android: {

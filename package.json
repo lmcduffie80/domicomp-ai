@@ -16,7 +16,9 @@
     "test:coverage": "vitest run --coverage",
     "cap:sync": "cap sync",
     "cap:ios": "cap open ios",
-    "cap:android": "cap open android"
+    "cap:android": "cap open android",
+    "mobile:dev": "cd mobile && pnpm dev",
+    "mobile:build": "cd mobile && pnpm build && cd .. && cap sync"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.122",
