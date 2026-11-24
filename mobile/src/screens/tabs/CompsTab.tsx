@@ -79,13 +79,20 @@ export function CompsTab({ deal, onChange, onSave, api }: Props) {
     <div className="p-4 space-y-4">
       {/* ARV result */}
       {deal.compAnalysis && (
-        <div className="rounded-2xl border border-green-100 bg-green-50 p-4">
-          <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">AI ARV Estimate</p>
-          <p className="text-2xl font-bold text-green-800">{money(deal.compAnalysis.arvMid)}</p>
-          <div className="flex gap-3 mt-1">
-            <span className="text-xs text-green-700">Low: {money(deal.compAnalysis.arvLow)}</span>
-            <span className="text-xs text-green-700">High: {money(deal.compAnalysis.arvHigh)}</span>
-            <span className="text-xs text-green-700">As-Is: {money(deal.compAnalysis.asIsValue)}</span>
+        <div className="rounded-2xl bg-gradient-to-br from-green-800 to-green-900 shadow-md p-4">
+          <p className="text-xs font-semibold text-green-300 uppercase tracking-wide mb-1">AI ARV Estimate</p>
+          <p className="text-3xl font-extrabold text-white">{money(deal.compAnalysis.arvMid)}</p>
+          <div className="flex gap-4 mt-2">
+            {[
+              { label: "Low", value: deal.compAnalysis.arvLow },
+              { label: "High", value: deal.compAnalysis.arvHigh },
+              { label: "As-Is", value: deal.compAnalysis.asIsValue },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded-xl bg-white/10 px-3 py-1.5">
+                <p className="text-[10px] text-green-300">{label}</p>
+                <p className="text-xs font-semibold text-white">{money(value)}</p>
+              </div>
+            ))}
           </div>
           <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium ${
             deal.compAnalysis.confidence === "high" ? "bg-green-100 text-green-800" :
@@ -157,9 +164,12 @@ export function CompsTab({ deal, onChange, onSave, api }: Props) {
 
       {/* Comps list */}
       {deal.comps.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
-          <p className="text-4xl mb-3">🏘</p>
-          <p>No comps loaded. Search a property first to pull nearby comps.</p>
+        <div className="mt-8 flex flex-col items-center gap-3 px-6 text-center">
+          <div className="grid size-20 place-items-center rounded-3xl bg-blue-50">
+            <span className="text-4xl">🏘️</span>
+          </div>
+          <p className="text-base font-semibold text-slate-700">No comps yet</p>
+          <p className="text-sm text-slate-400 leading-relaxed">Search a property address in the Property tab to pull nearby comparable sales.</p>
         </div>
       ) : (
         <div className="space-y-3">

@@ -177,6 +177,139 @@ export async function sendOrgInviteEmail({ to, inviterName, orgName, inviteUrl }
   });
 }
 
+/** Sends a welcome email when a new user creates their account. */
+export async function sendWelcomeEmail({ to, firstName }: { to: string; firstName?: string | null }) {
+  const resend = resendClient();
+  const name = firstName ?? "there";
+  const year = new Date().getFullYear();
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Welcome to DomiComp AI</title></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:48px 16px">
+<tr><td align="center">
+<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+
+  <!-- Header -->
+  <tr><td style="background:#0d1f17;border-radius:16px 16px 0 0;padding:28px 36px 24px">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="vertical-align:middle;padding-right:12px">
+        <div style="width:40px;height:40px;background:#0f6b4f;border-radius:10px;display:inline-flex;align-items:center;justify-content:center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 20" fill="white">
+            <path d="M10 2L2 9h2v9h4v-5h4v5h4V9h2L10 2z"/>
+          </svg>
+        </div>
+      </td>
+      <td style="vertical-align:middle">
+        <p style="margin:0;font-size:17px;font-weight:700;color:#ffffff">DomiComp AI</p>
+        <p style="margin:2px 0 0;font-size:11px;color:#6ee7b7;text-transform:uppercase;letter-spacing:0.4px">Powered by Agrovus, LLC</p>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="background:#ffffff;padding:36px 36px 28px">
+    <h1 style="margin:0 0 14px;font-size:24px;font-weight:700;color:#0f172a">Welcome, ${name}! 🎉</h1>
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#475569">
+      You're now set up on <strong>DomiComp AI</strong>. Here's how to analyze your first deal in under 5 minutes:
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:24px">
+      ${[
+        ["🏠", "Search an address", "Pull comps, AVM, and property records instantly."],
+        ["📸", "Walk the property", "Shoot room photos — AI scores condition and builds your repair scope."],
+        ["🧮", "Review the numbers", "ARV, rehab budget, max offer, and profit — all on one screen."],
+      ].map(([icon, title, body]) => `
+      <tr><td style="padding:8px 0;border-bottom:1px solid #f1f5f9">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="font-size:22px;padding-right:12px;vertical-align:top;padding-top:2px">${icon}</td>
+          <td><p style="margin:0;font-size:14px;font-weight:700;color:#0f172a">${title}</p>
+          <p style="margin:2px 0 0;font-size:13px;color:#64748b">${body}</p></td>
+        </tr></table>
+      </td></tr>`).join("")}
+    </table>
+    <a href="https://domicomp-ai.com/app" style="display:inline-block;background:#0f6b4f;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:10px">
+      Start your first deal →
+    </a>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#f8fafc;border-radius:0 0 16px 16px;padding:20px 36px;border-top:1px solid #e2e8f0">
+    <p style="margin:0;font-size:11px;color:#94a3b8;line-height:1.6">
+      Questions? Reply to this email anytime.<br/>
+      © ${year} Agrovus, LLC · DomiComp AI
+    </p>
+  </td></tr>
+
+</table></td></tr></table>
+</body></html>`;
+
+  return resend.emails.send({
+    from: `DomiComp AI <${FROM_ADDRESS}>`,
+    replyTo: REPLY_TO,
+    to,
+    subject: `Welcome to DomiComp AI, ${name}!`,
+    html,
+  });
+}
+
+/** Sends a subscription confirmation email after a successful Stripe payment. */
+export async function sendSubscriptionConfirmedEmail({ to, firstName, plan, orgName }: {
+  to: string;
+  firstName?: string | null;
+  plan: string;
+  orgName: string;
+}) {
+  const resend = resendClient();
+  const name = firstName ?? "there";
+  const planLabel = plan === "team" ? "Team ($199/mo)" : "Pro ($79/mo)";
+  const year = new Date().getFullYear();
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:48px 16px">
+<tr><td align="center">
+<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+  <tr><td style="background:#0d1f17;border-radius:16px 16px 0 0;padding:28px 36px">
+    <p style="margin:0;font-size:17px;font-weight:700;color:#fff">DomiComp AI</p>
+    <p style="margin:2px 0 0;font-size:11px;color:#6ee7b7;text-transform:uppercase">Subscription confirmed</p>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px">
+    <h1 style="margin:0 0 12px;font-size:22px;font-weight:700">You're all set, ${name}! ✅</h1>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569">
+      <strong>${orgName}</strong> is now on the <strong>${planLabel}</strong> plan. Your team has full access to all DomiComp AI features.
+    </p>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px 20px;margin-bottom:24px">
+      <p style="margin:0;font-size:13px;font-weight:700;color:#15803d">What's included</p>
+      <ul style="margin:8px 0 0;padding:0 0 0 18px;font-size:13px;color:#166534;line-height:1.8">
+        <li>Unlimited deals &amp; property lookups</li>
+        <li>AI photo condition analysis</li>
+        <li>Rehab pricing from Home Depot &amp; Lowe's</li>
+        <li>Comp ARV estimate + AI deal chat</li>
+        <li>Team invite &amp; shared workspace</li>
+        <li>iOS + Android mobile app</li>
+      </ul>
+    </div>
+    <a href="https://domicomp-ai.com/app" style="display:inline-block;background:#0f6b4f;color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 28px;border-radius:10px">Open DomiComp AI →</a>
+  </td></tr>
+  <tr><td style="background:#f8fafc;border-radius:0 0 16px 16px;padding:20px 36px;border-top:1px solid #e2e8f0">
+    <p style="margin:0;font-size:11px;color:#94a3b8">© ${year} Agrovus, LLC · DomiComp AI · <a href="https://domicomp-ai.com/app/settings" style="color:#94a3b8">Manage subscription</a></p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`;
+
+  return resend.emails.send({
+    from: `DomiComp AI <${FROM_ADDRESS}>`,
+    replyTo: REPLY_TO,
+    to,
+    subject: `Subscription confirmed — ${orgName} is now on DomiComp AI ${plan === "team" ? "Team" : "Pro"}`,
+    html,
+  });
+}
+
 /** Re-delivers any Clerk email event through Resend (invitation, verification, etc.). */
 export async function forwardClerkEmail(opts: {
   to: string;

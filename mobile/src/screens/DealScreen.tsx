@@ -167,19 +167,20 @@ export function DealScreen() {
           )}
 
           {!listError && deals.length > 0 && (
-            <div className="space-y-2">
-              {deals.map((d) => (
+            <div className="space-y-3">
+              {deals.map((d, i) => (
                 <button
                   key={d.id}
                   onClick={() => openDeal(d.id)}
-                  className="w-full flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-4 text-left shadow-sm active:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 rounded-2xl bg-white border border-slate-100 px-4 py-4 text-left shadow-sm active:scale-[0.98] transition-transform"
                 >
-                  <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-green-50">
-                    <Home className="size-5 text-green-700" />
+                  <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-green-700 to-green-900 shadow-sm">
+                    <Home className="size-5 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-slate-900">{d.address || "Untitled deal"}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="truncate font-semibold text-slate-900 text-sm">{d.address || "Untitled deal"}</p>
+                    <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                      <span className={`inline-block size-1.5 rounded-full ${i === 0 ? "bg-green-500" : "bg-slate-300"}`} />
                       {new Date(d.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </p>
                   </div>

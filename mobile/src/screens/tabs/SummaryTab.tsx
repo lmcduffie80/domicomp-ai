@@ -21,13 +21,20 @@ const CHIPS = [
   "Compare ARV approaches",
 ];
 
-function NumberCard({ label, value, sub, positive }: { label: string; value: string; sub?: string; positive?: boolean | null }) {
-  const color = positive == null ? "" : positive ? "text-green-700" : "text-red-600";
+function NumberCard({ label, value, sub, positive, highlight }: { label: string; value: string; sub?: string; positive?: boolean | null; highlight?: boolean }) {
+  if (highlight) return (
+    <div className="col-span-2 rounded-2xl bg-gradient-to-br from-green-800 to-green-900 shadow-md p-4">
+      <p className="text-xs text-green-300 uppercase tracking-wide font-medium">{label}</p>
+      <p className="text-2xl font-extrabold mt-1 text-white">{value}</p>
+      {sub && <p className="text-xs text-green-300 mt-0.5">{sub}</p>}
+    </div>
+  );
+  const color = positive == null ? "text-slate-900" : positive ? "text-green-700" : "text-red-600";
   return (
-    <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4">
-      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className={`text-xl font-bold mt-1 ${color || "text-gray-900"}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+    <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4">
+      <p className="text-[11px] text-slate-400 uppercase tracking-wide font-medium">{label}</p>
+      <p className={`text-lg font-bold mt-1 ${color}`}>{value}</p>
+      {sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -112,12 +119,12 @@ export function SummaryTab({ deal, onChange, onSave, api }: Props) {
       <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={chatRef}>
         {/* Deal numbers */}
         <div className="grid grid-cols-2 gap-3">
+          <NumberCard label="Max Offer" value={money(nums.mao)} sub={`${deal.settings.maoPct}% rule`} highlight />
           <NumberCard label="ARV" value={money(nums.arv)} sub={nums.arvSource} />
-          <NumberCard label="Rehab" value={money(nums.rehab)} />
-          <NumberCard label="MAO" value={money(nums.mao)} sub={`at ${deal.settings.maoPct}%`} />
+          <NumberCard label="Rehab Budget" value={money(nums.rehab)} />
           <NumberCard label="Closing/Holding" value={money(nums.closingHolding)} sub={`${deal.settings.closingHoldingPct}%`} />
           {nums.profit != null && (
-            <NumberCard label="Profit" value={money(nums.profit)} positive={nums.profit > 0} />
+            <NumberCard label="Est. Profit" value={money(nums.profit)} positive={nums.profit > 0} />
           )}
           {nums.roi != null && (
             <NumberCard label="ROI" value={`${(nums.roi * 100).toFixed(1)}%`} positive={nums.roi > 0} />

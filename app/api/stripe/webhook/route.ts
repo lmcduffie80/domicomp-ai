@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { stripe } from "@/lib/stripe";
+import { sendSubscriptionConfirmedEmail } from "@/lib/email";
 import type Stripe from "stripe";
 
 // Stripe requires the raw body to verify the signature
@@ -32,14 +33,34 @@ export async function POST(req: NextRequest) {
       const { orgId, plan } = sub.metadata ?? {};
       if (orgId && plan) {
         const active = sub.status === "active" || sub.status === "trialing";
-        await clerk.organizations.updateOrganizationMetadata(orgId, {
-          publicMetadata: {
-            stripePlan:           active ? plan : null,
-            stripeSubscriptionId: sub.id,
-            stripeStatus:         sub.status,
-          },
-        });
+        const [org] = await Promise.all([
+          clerk.organizations.getOrganization({ organizationId: orgId }),
+          clerk.organizations.updateOrganizationMetadata(orgId, {
+            publicMetadata: {
+              stripePlan:           active ? plan : null,
+              stripeSubscriptionId: sub.id,
+              stripeStatus:         sub.status,
+            },
+          }),
+        ]);
         console.log(`Org ${orgId} subscription ${sub.status} → plan: ${plan}`);
+
+        // Send confirmation email to org admins on first activation
+        if (event.type === "customer.subscription.created" && active) {
+          try {
+            const { data: members } = await clerk.organizations.getOrganizationMembershipList({ organizationId: orgId, limit: 20 });
+            const admins = members.filter(m => m.role === "org:admin");
+            await Promise.all(admins.map(async (m) => {
+              const user = await clerk.users.getUser(m.publicUserData?.userId ?? "");
+              const email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress;
+              if (email) {
+                await sendSubscriptionConfirmedEmail({ to: email, firstName: user.firstName, plan, orgName: org.name });
+              }
+            }));
+          } catch (e) {
+            console.error("Subscription email error:", e);
+          }
+        }
       }
       break;
     }

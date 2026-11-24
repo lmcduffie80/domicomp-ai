@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Calculator, Camera, Download, Hammer, Home, MapPinned, Plus, Settings, ShieldCheck, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 import { InviteDialog } from "@/components/invite-dialog";
+import { WelcomeModal } from "@/components/welcome-modal";
 import { CompsTable } from "@/components/comps-table";
 import { DealChat } from "@/components/deal-chat";
 import { DealSummary } from "@/components/deal-summary";
@@ -129,6 +130,7 @@ export default function DealApp({ isAdmin = false }: { isAdmin?: boolean }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <WelcomeModal />
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
           <BrandMark />

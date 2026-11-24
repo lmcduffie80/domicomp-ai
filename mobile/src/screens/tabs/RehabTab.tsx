@@ -85,18 +85,18 @@ export function RehabTab({ deal, onChange, onSave, api }: Props) {
   return (
     <div className="p-4 space-y-4">
       {/* Totals card */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Rehab Budget</p>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="rounded-2xl bg-gradient-to-br from-green-800 to-green-900 shadow-md p-4">
+        <p className="text-xs font-semibold text-green-300 uppercase tracking-wide mb-3">Rehab Budget</p>
+        <p className="text-3xl font-extrabold text-white">{money(totals.total)}</p>
+        <div className="grid grid-cols-3 gap-2 mt-3">
           {[
             { label: "Materials", value: totals.materials },
             { label: "Labor", value: totals.labor },
             { label: "Contingency", value: totals.contingency },
-            { label: "Total", value: totals.total, bold: true },
-          ].map(({ label, value, bold }) => (
-            <div key={label} className={`rounded-xl bg-gray-50 px-3 py-2 ${bold ? "col-span-2 bg-green-50" : ""}`}>
-              <p className="text-xs text-gray-500">{label}</p>
-              <p className={`font-semibold ${bold ? "text-green-800 text-lg" : "text-gray-900 text-sm"}`}>{money(value)}</p>
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-xl bg-white/10 px-2 py-2">
+              <p className="text-[10px] text-green-300">{label}</p>
+              <p className="text-xs font-semibold text-white mt-0.5">{money(value)}</p>
             </div>
           ))}
         </div>
