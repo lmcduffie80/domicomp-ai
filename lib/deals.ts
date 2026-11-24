@@ -5,6 +5,7 @@ import { deals, photos } from "@/lib/db/schema";
 import { DEFAULT_SETTINGS, type Deal, type DealSettings, type PhotoMeta } from "@/lib/schemas";
 import { uid } from "@/lib/id";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function emptyDeal(_orgId?: string): Deal {
   const now = Date.now();
   return {

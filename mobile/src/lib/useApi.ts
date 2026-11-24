@@ -1,26 +1,23 @@
+import { useCallback, useRef } from "react";
 import { useAuth } from "@clerk/react";
-import { useMemo, useRef, useCallback } from "react";
 import { makeApi } from "./api";
+
+type Api = ReturnType<typeof makeApi>;
 
 export function useApi() {
   const { getToken } = useAuth();
   const tokenRef = useRef<string | null>(null);
 
-  const refreshToken = useCallback(async () => {
+  const getApi = useCallback(async (): Promise<Api> => {
     tokenRef.current = await getToken();
+    return makeApi(tokenRef.current);
   }, [getToken]);
 
-  const api = useMemo(() => {
-    // We'll refresh inline on each call
-    return {
-      async call<T>(fn: (api: ReturnType<typeof makeApi>) => Promise<T>): Promise<T> {
-        if (!tokenRef.current) {
-          tokenRef.current = await getToken();
-        }
-        return fn(makeApi(tokenRef.current));
-      },
-    };
-  }, [getToken]);
+  /** call(api => api.deals.list())  */
+  async function call<T>(fn: (api: Api) => Promise<T>): Promise<T> {
+    const api = await getApi();
+    return fn(api);
+  }
 
-  return { api, refreshToken };
+  return { call, getApi };
 }

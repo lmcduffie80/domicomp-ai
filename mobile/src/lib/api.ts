@@ -1,12 +1,8 @@
-/**
- * API client for the DomiComp AI backend.
- * Passes the Clerk JWT as a Bearer token so the Next.js API routes can auth the request.
- */
+import type { Deal, CompAnalysis, PricedItem } from "./schemas";
 
 const BASE = typeof window !== "undefined" &&
   (window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
-    ? "https://domicomp-ai.com"
-    : "";
+    ? "https://domicomp-ai.com" : "";
 
 async function req<T>(path: string, token: string | null, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -27,19 +23,28 @@ async function req<T>(path: string, token: string | null, init?: RequestInit): P
 
 export type DealListItem = { id: string; address: string; updatedAt: number };
 export type Usage = { used: number; limit: number; plan: string; comped: boolean };
-export type Deal = Record<string, unknown> & { id: string; address: string };
-export type PropertyResult = { property: unknown; avm: unknown; comps: unknown[] };
 
 export function makeApi(token: string | null) {
+  const r = <T>(path: string, init?: RequestInit) => req<T>(path, token, init);
+  const post = <T>(path: string, body: unknown) => r<T>(path, { method: "POST", body: JSON.stringify(body) });
+
   return {
     deals: {
-      list: () => req<{ deals: DealListItem[] }>("/api/deals", token),
-      get: (id: string) => req<{ deal: Deal; photoUrls: Record<string, string> }>(`/api/deals/${id}`, token),
-      create: () => req<{ deal: Deal }>("/api/deals", token, { method: "POST", body: JSON.stringify({ create: true }) }),
-      save: (deal: Deal) => req<{ deal: Deal }>("/api/deals", token, { method: "POST", body: JSON.stringify({ deal }) }),
-      delete: (id: string) => req(`/api/deals?id=${id}`, token, { method: "DELETE" }),
+      list: () => r<{ deals: DealListItem[] }>("/api/deals"),
+      get: (id: string) => r<{ deal: Deal; photoUrls: Record<string, string> }>(`/api/deals/${id}`),
+      create: () => post<{ deal: Deal }>("/api/deals", { create: true }),
+      save: (deal: Deal) => post<{ deal: Deal }>("/api/deals", { deal }),
+      delete: (id: string) => r(`/api/deals?id=${id}`, { method: "DELETE" }),
     },
-    usage: () => req<Usage>("/api/usage", token),
-    property: (address: string) => req<PropertyResult>(`/api/property?address=${encodeURIComponent(address)}`, token),
+    usage: () => r<Usage>("/api/usage"),
+    property: (address: string) => r<{ property: unknown; avm: unknown; comps: unknown[] }>(`/api/property?address=${encodeURIComponent(address)}`),
+    compAnalysis: (body: unknown) => post<CompAnalysis>("/api/comp-analysis", body),
+    rehabPricing: (body: unknown) => post<{ items: PricedItem[]; checkedAt: string }>("/api/rehab-pricing", body),
+    photos: {
+      upload: (dealId: string, room: string, dataUrl: string) => post<{ url: string; photoId: string }>("/api/photos", { dealId, room, dataUrl }),
+      delete: (photoId: string) => r(`/api/photos?id=${photoId}`, { method: "DELETE" }),
+    },
+    chatUrl: () => `${BASE}/api/chat`,
+    authHeader: () => token ? { Authorization: `Bearer ${token}` } : {},
   };
 }

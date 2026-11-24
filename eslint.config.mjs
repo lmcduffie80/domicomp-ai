@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Capacitor build outputs — minified bundles should not be linted
+    "www/**",
+    "ios/**",
+    "android/**",
+    // Mobile Vite app — has its own tsconfig/eslint scope
+    "mobile/**",
   ]),
 ]);
 
