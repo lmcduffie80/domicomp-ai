@@ -43,7 +43,7 @@ export default function MarketingPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground text-pretty">
             DomiComp AI helps your team analyze deals faster: nearby comps from RentCast, AI photo walkthroughs, and
-            material pricing pulled from Home Depot and Lowe&apos;s. Powered by Agrovus.
+            material pricing pulled from Home Depot and Lowe&apos;s. Powered by Agrovus, LLC.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Cta href="/sign-up" size="lg">

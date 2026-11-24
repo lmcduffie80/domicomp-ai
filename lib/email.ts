@@ -55,7 +55,7 @@ export function buildOrgInviteHtml({ inviterName, orgName, inviteUrl }: Omit<Org
                         </td>
                         <td style="vertical-align:middle">
                           <p style="margin:0;font-size:17px;font-weight:700;color:#ffffff;letter-spacing:-0.3px">DomiComp AI</p>
-                          <p style="margin:2px 0 0;font-size:11px;color:#6ee7b7;letter-spacing:0.4px;text-transform:uppercase">Powered by Agrovus</p>
+                          <p style="margin:2px 0 0;font-size:11px;color:#6ee7b7;letter-spacing:0.4px;text-transform:uppercase">Powered by Agrovus, LLC</p>
                         </td>
                       </tr>
                     </table>
@@ -149,7 +149,7 @@ export function buildOrgInviteHtml({ inviterName, orgName, inviteUrl }: Omit<Org
             <td style="background:#f8fafc;border-radius:0 0 16px 16px;padding:20px 36px;border-top:1px solid #e2e8f0">
               <p style="margin:0;font-size:11px;color:#94a3b8;line-height:1.6">
                 If you weren't expecting this invitation, you can safely ignore this email.<br/>
-                &copy; ${year} Old Vine Properties, LLC &middot; DomiComp AI &middot; Powered by Agrovus
+                &copy; ${year} Old Vine Properties, LLC &middot; DomiComp AI &middot; Powered by Agrovus, LLC
               </p>
             </td>
           </tr>

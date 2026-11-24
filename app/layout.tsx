@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DomiComp AI · Powered by Agrovus",
+  title: "DomiComp AI · Powered by Agrovus, LLC",
   description: "Real estate comps, photo condition analysis, and rehab budgets priced from Home Depot and Lowe's.",
   appleWebApp: { capable: true, title: "DomiComp AI", statusBarStyle: "default" },
 };
