@@ -7,8 +7,8 @@ const config: CapacitorConfig = {
   // Dev only: uncomment below to point at local Vite dev server for hot reload
   // server: { url: "http://192.168.x.x:5173", cleartext: true },
   ios: {
-    contentInset: "automatic",
-    backgroundColor: "#ffffff",
+    contentInset: "never",
+    backgroundColor: "#0d1f17",
     scrollEnabled: true,
     limitsNavigationsToAppBoundDomains: false,
     allowsLinkPreview: false,

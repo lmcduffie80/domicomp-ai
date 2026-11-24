@@ -102,7 +102,7 @@ export function CompsTab({ deal, onChange, onSave, api }: Props) {
             {deal.compAnalysis.confidence} confidence
           </span>
           {deal.compAnalysis.reasoning && (
-            <p className="text-xs text-green-800 mt-2 leading-relaxed">{deal.compAnalysis.reasoning}</p>
+            <p className="text-xs text-emerald-100/90 mt-2 leading-relaxed">{deal.compAnalysis.reasoning}</p>
           )}
         </div>
       )}
