@@ -73,7 +73,7 @@ export function InviteDialog() {
                 <div>
                   <h2 className="font-semibold">Invite team member</h2>
                   <p className="text-sm text-muted-foreground">
-                    They'll receive a branded invite email from DomiComp AI.
+                    They&apos;ll receive a branded invite email from DomiComp AI.
                   </p>
                 </div>
 
