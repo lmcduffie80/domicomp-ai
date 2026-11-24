@@ -2,7 +2,7 @@
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Calculator, Camera, Hammer, Home, MapPinned, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Calculator, Camera, Hammer, Home, MapPinned, Plus, Settings, ShieldCheck, Trash2 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 import { InviteDialog } from "@/components/invite-dialog";
 import { CompsTable } from "@/components/comps-table";
@@ -160,6 +160,12 @@ export default function DealApp({ isAdmin = false }: { isAdmin?: boolean }) {
             <Button variant="ghost" size="icon-lg" aria-label="Delete deal" onClick={remove}>
               <Trash2 />
             </Button>
+            <Link
+              href="/app/settings"
+              className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <Settings className="size-3.5" /> Settings
+            </Link>
             {isAdmin && (
               <Link
                 href="/app/admin"

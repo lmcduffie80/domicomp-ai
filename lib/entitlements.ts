@@ -20,16 +20,30 @@ const PLANS: Record<PlanKey, Omit<Entitlements, "comped" | "plan">> = {
 export async function getOrgEntitlements(orgId: string): Promise<Entitlements | null> {
   const client = await clerkClient();
   const org = await client.organizations.getOrganization({ organizationId: orgId });
-  const meta = (org.publicMetadata ?? {}) as { comped?: boolean; founder?: boolean };
+  const meta = (org.publicMetadata ?? {}) as {
+    comped?: boolean;
+    founder?: boolean;
+    stripePlan?: string;
+    stripeStatus?: string;
+  };
 
+  // 1. Comped / founder override — always wins
   if (meta.comped || meta.founder) {
     return { plan: "founder", ...PLANS.founder, comped: true };
   }
 
+  // 2. Direct Stripe subscription (set by webhook)
+  if (meta.stripePlan && (meta.stripeStatus === "active" || meta.stripeStatus === "trialing")) {
+    const p = meta.stripePlan as PlanKey;
+    if (PLANS[p]) return { plan: p, ...PLANS[p], comped: false };
+  }
+
+  // 3. Clerk Billing (if ever connected)
   const { has } = await auth();
   if (has({ plan: "team" })) return { plan: "team", ...PLANS.team, comped: false };
   if (has({ plan: "pro" })) return { plan: "pro", ...PLANS.pro, comped: false };
 
+  // 4. Dev bypass
   if (process.env.ALLOW_UNPAID_ACCESS === "true") {
     return { plan: "team", ...PLANS.team, comped: false };
   }

@@ -8,16 +8,20 @@ export function useApi() {
   const { getToken } = useAuth();
   const tokenRef = useRef<string | null>(null);
 
+  // Stable reference — only recreated when getToken identity changes (almost never)
   const getApi = useCallback(async (): Promise<Api> => {
     tokenRef.current = await getToken();
     return makeApi(tokenRef.current);
   }, [getToken]);
 
-  /** call(api => api.deals.list())  */
-  async function call<T>(fn: (api: Api) => Promise<T>): Promise<T> {
-    const api = await getApi();
-    return fn(api);
-  }
+  // Memoized so useCallback deps in consumers stay stable
+  const call = useCallback(
+    async <T>(fn: (api: Api) => Promise<T>): Promise<T> => {
+      const api = await getApi();
+      return fn(api);
+    },
+    [getApi]
+  );
 
   return { call, getApi };
 }

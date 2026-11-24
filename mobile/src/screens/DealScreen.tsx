@@ -36,10 +36,10 @@ export function DealScreen() {
   const [listError, setListError] = useState<string | null>(null);
   const apiRef = useRef<ReturnType<typeof makeApi> | null>(null);
 
-  /* Keep a live api instance so tabs can call it synchronously */
+  /* Keep a live api instance so tabs can call it synchronously — only refresh when getApi changes */
   useEffect(() => {
     getApi().then(a => { apiRef.current = a; });
-  });
+  }, [getApi]);
 
   const loadDeals = useCallback(async () => {
     setListError(null);
@@ -135,7 +135,7 @@ export function DealScreen() {
             <h2 className="font-semibold text-slate-700 text-base">Your Deals</h2>
             <button
               onClick={newDeal}
-              className="flex items-center gap-1.5 rounded-xl bg-green-800 px-4 py-2 text-sm font-semibold text-white active:scale-95 shadow-sm"
+              className="flex items-center gap-1.5 rounded-2xl bg-green-800 px-4 py-2.5 text-sm font-semibold text-white active:scale-95 shadow-sm transition-transform"
             >
               <Plus className="size-4" /> New Deal
             </button>
