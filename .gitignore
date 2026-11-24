@@ -41,3 +41,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .clerk/
+
+# Capacitor build artifacts (keep source, ignore build output)
+ios/App/App/public/
+ios/App/Pods/
+ios/App/.build/
+android/app/src/main/assets/public/
+android/.gradle/
+android/build/
+www/
