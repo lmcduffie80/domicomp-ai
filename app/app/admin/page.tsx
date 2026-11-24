@@ -8,10 +8,10 @@ import { AdminOrgsTable } from "@/components/admin-orgs-table";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { BrandMark } from "@/components/brand";
-
-export const dynamic = "force-dynamic";
+import { unstable_noStore as noStore } from "next/cache";
 
 export default async function AdminPage() {
+  noStore();
   await requireSuperAdmin();
 
   const clerk = await clerkClient();
