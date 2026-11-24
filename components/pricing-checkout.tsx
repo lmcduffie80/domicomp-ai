@@ -41,7 +41,7 @@ export function PricingCheckout() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Checkout failed");
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch (e) {
       setError((e as Error).message);
       setLoading(null);

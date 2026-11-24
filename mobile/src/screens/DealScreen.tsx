@@ -41,6 +41,14 @@ export function DealScreen() {
     getApi().then(a => { apiRef.current = a; });
   }, [getApi]);
 
+  const openDeal = useCallback(async (id: string) => {
+    const { deal: d, photoUrls: urls } = await call(a => a.deals.get(id));
+    setDeal(d);
+    setPhotoUrls(urls ?? {});
+    setTab("property");
+    setView("deal");
+  }, [call]);
+
   const loadDeals = useCallback(async () => {
     setListError(null);
     try {
@@ -58,7 +66,6 @@ export function DealScreen() {
   useEffect(() => {
     setLoading(true);
     loadDeals().then(async (list) => {
-      // Auto-open the most recent deal that has an address set
       const best = list.find(d => d.address?.trim()) ?? list[0];
       if (best) await openDeal(best.id);
     }).finally(() => setLoading(false));
@@ -73,14 +80,6 @@ export function DealScreen() {
     setView("deal");
   }
 
-  async function openDeal(id: string) {
-    const { deal: d, photoUrls: urls } = await call(a => a.deals.get(id));
-    setDeal(d);
-    setPhotoUrls(urls ?? {});
-    setTab("property");
-    setView("deal");
-  }
-
   async function saveDeal(updated: Deal) {
     setDeal(updated);
     await call(a => a.deals.save(updated));
@@ -90,6 +89,61 @@ export function DealScreen() {
   function handleChange(updated: Deal) {
     setDeal(updated);
   }
+
+  /* ─── Swipe between tabs (non-passive native listeners) ── */
+  const TAB_IDS = TABS.map(t => t.id);
+  const swipeRef = useRef<HTMLDivElement | null>(null);
+  const swipeStartX = useRef<number | null>(null);
+  const swipeStartY = useRef<number | null>(null);
+  const swipeBlocked = useRef(false); // true when scroll direction locked vertical
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
+
+  useEffect(() => {
+    const el = swipeRef.current;
+    if (!el) return;
+
+    function onStart(e: TouchEvent) {
+      swipeStartX.current = e.touches[0].clientX;
+      swipeStartY.current = e.touches[0].clientY;
+      swipeBlocked.current = false;
+    }
+
+    function onMove(e: TouchEvent) {
+      if (swipeStartX.current === null || swipeStartY.current === null) return;
+      const dx = e.touches[0].clientX - swipeStartX.current;
+      const dy = e.touches[0].clientY - swipeStartY.current;
+      if (swipeBlocked.current) return; // already decided: scroll
+      if (Math.abs(dy) > Math.abs(dx)) {
+        swipeBlocked.current = true; // vertical → let scroll through
+        return;
+      }
+      if (Math.abs(dx) > 10) {
+        e.preventDefault(); // horizontal → block scroll, we'll handle it
+      }
+    }
+
+    function onEnd(e: TouchEvent) {
+      if (swipeStartX.current === null || swipeBlocked.current) return;
+      const dx = e.changedTouches[0].clientX - swipeStartX.current;
+      swipeStartX.current = null;
+      swipeStartY.current = null;
+      if (Math.abs(dx) < 40) return;
+      const idx = TAB_IDS.indexOf(tabRef.current);
+      if (dx < 0 && idx < TAB_IDS.length - 1) setTab(TAB_IDS[idx + 1]);
+      if (dx > 0 && idx > 0) setTab(TAB_IDS[idx - 1]);
+    }
+
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove",  onMove,  { passive: false }); // must be non-passive to preventDefault
+    el.addEventListener("touchend",   onEnd,   { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove",  onMove);
+      el.removeEventListener("touchend",   onEnd);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // attach once; tabRef keeps current tab value
 
   /* ─── Loading ──────────────────────────────────────── */
   if (loading) {
@@ -205,33 +259,40 @@ export function DealScreen() {
     <div className="flex flex-col bg-slate-50" style={{ minHeight: "100dvh" }}>
       {/* Deal header */}
       <div className="bg-[#0d1f17] px-4 pb-3 pt-4 shrink-0">
+        {/* Back row */}
+        <button
+          onClick={() => setView("list")}
+          className="flex items-center gap-1 text-emerald-400 active:opacity-70 mb-2"
+        >
+          <ChevronLeft className="size-4" />
+          <span className="text-xs font-semibold uppercase tracking-wide">All Deals</span>
+        </button>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setView("list")}
-            className="rounded-xl bg-white/10 p-2 text-emerald-300 active:scale-90"
-          >
-            <ChevronLeft className="size-5" />
-          </button>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold text-white leading-tight">
+            <p className="truncate font-bold text-white text-base leading-tight">
               {deal?.address || "Untitled deal"}
             </p>
-            <p className="text-xs text-emerald-400">{organization?.name}</p>
+            <p className="text-xs text-emerald-400 mt-0.5">{organization?.name}</p>
           </div>
           {membership?.role === "org:admin" && (
             <button
               onClick={newDeal}
-              className="rounded-xl bg-white/10 p-2 text-emerald-300 active:scale-90"
+              className="flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-emerald-300 active:scale-90"
               aria-label="New deal"
             >
-              <Plus className="size-4" />
+              <Plus className="size-3.5" />
+              <span className="text-xs font-medium">New</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Tab content */}
-      <div className={`flex-1 overflow-y-auto ${tab === "summary" ? "flex flex-col" : ""}`} style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 64px)" }}>
+      {/* Tab content — swipeable */}
+      <div
+        ref={swipeRef}
+        className={`flex-1 overflow-y-auto ${tab === "summary" ? "flex flex-col" : ""}`}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 64px)" }}
+      >
         {deal && tab === "property" && (
           <PropertyTab deal={deal} photoUrls={photoUrls} onChange={handleChange} onSave={saveDeal} api={api} />
         )}

@@ -88,10 +88,11 @@ export function SignInScreen() {
               type="email"
               autoCapitalize="none"
               autoCorrect="off"
-              autoFocus
+              autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleSendCode()}
+              onClick={e => (e.target as HTMLInputElement).focus()}
               placeholder="you@example.com"
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
             />
@@ -123,7 +124,6 @@ export function SignInScreen() {
             <input
               type="text"
               inputMode="numeric"
-              autoFocus
               maxLength={6}
               value={code}
               onChange={e => setCode(e.target.value.replace(/\D/g, ""))}

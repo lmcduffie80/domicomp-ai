@@ -18,8 +18,6 @@ const PLAN_COLORS: Record<string, string> = {
   founder: "bg-amber-50 text-amber-700 border-amber-100",
 };
 
-type Tab = "company" | "billing";
-
 export function SettingsClient({ plan, comped }: { plan: string; comped: boolean }) {
   return (
     <div className="min-h-dvh bg-background">

@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { ArrowRight, BarChart3, Camera, CheckCircle2, MapPin, ShoppingCart, X } from "lucide-react";
-import Link from "next/link";
-
 const STEPS = [
   {
     icon: MapPin,
@@ -40,7 +38,7 @@ export function WelcomeModal() {
   useEffect(() => {
     // Show only once per browser
     if (!localStorage.getItem(LS_KEY)) {
-      setOpen(true);
+      startTransition(() => setOpen(true));
     }
   }, []);
 

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Show } from "@clerk/nextjs";
 import {
-  ArrowRight, BarChart3, BedDouble, Bot, Building2, Camera,
+  ArrowRight, BarChart3, Bot, Building2, Camera,
   CheckCircle2, ChevronRight, Clock, DollarSign, Home, MapPin,
-  Ruler, ShoppingCart, Sparkles, Users, Zap,
+  ShoppingCart, Sparkles, Users, Zap,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 import { buttonVariants } from "@/components/ui/button";
