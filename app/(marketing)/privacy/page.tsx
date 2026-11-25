@@ -68,7 +68,8 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-slate-900 mb-2">6. Data Retention</h2>
           <p>
             Your deal data, photos, and account information are retained as long as your account is active. You may
-            delete your account and associated data at any time by contacting us at{" "}
+            delete your account and associated data at any time by tapping &ldquo;Delete account&rdquo; in the app, or
+            by contacting us at{" "}
             <a href="mailto:support@domicomp-ai.com" className="text-green-700 underline">support@domicomp-ai.com</a>.
           </p>
         </div>
