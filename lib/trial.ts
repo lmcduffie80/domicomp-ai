@@ -1,4 +1,4 @@
-export const TRIAL_DAYS = 14;
+export const TRIAL_DAYS = 7;
 const DAY_MS = 86_400_000;
 
 /** Orgs created before the trial shipped get a full trial counted from this date instead. */

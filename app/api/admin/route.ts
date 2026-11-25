@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/lib/admin";
 import { clerkClient } from "@clerk/nextjs/server";
+import { subscriptionStatus, type OrgBillingMeta } from "@/lib/subscription-status";
 
 export async function POST(req: NextRequest) {
   await requireSuperAdmin();
@@ -14,10 +15,10 @@ export async function POST(req: NextRequest) {
     const org = await clerk.organizations.getOrganization({ organizationId: orgId });
     const meta = (org.publicMetadata ?? {}) as Record<string, unknown>;
     const next = !meta.comped;
-    await clerk.organizations.updateOrganizationMetadata(orgId, {
-      publicMetadata: { ...meta, comped: next },
-    });
-    return NextResponse.json({ comped: next });
+    const publicMetadata = { ...meta, comped: next };
+    await clerk.organizations.updateOrganizationMetadata(orgId, { publicMetadata });
+    const { status } = subscriptionStatus(publicMetadata as OrgBillingMeta, org.createdAt);
+    return NextResponse.json({ comped: next, status });
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });

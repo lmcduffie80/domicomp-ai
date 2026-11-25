@@ -4,6 +4,7 @@ import { Show } from "@clerk/nextjs";
 import { BrandMark } from "@/components/brand";
 import { PricingCheckout } from "@/components/pricing-checkout";
 import { TrialEndedBanner } from "@/components/trial-ended-banner";
+import { AdminNavLink } from "@/components/admin-nav-link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,9 @@ export default function PricingPage() {
             Home
           </Link>
           <Show when="signed-in">
+            <Suspense>
+              <AdminNavLink size="default" />
+            </Suspense>
             <Link href="/app" className={cn(buttonVariants())}>
               Open app
             </Link>
@@ -40,7 +44,7 @@ export default function PricingPage() {
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Simple company pricing</h1>
           <p className="mt-3 text-muted-foreground">
             Billed per organization. Invite your team, share deals, and keep lookup usage under one plan. Every new
-            company starts with a 14-day free trial — no credit card required.
+            company starts with a 7-day free trial — no credit card required.
           </p>
         </div>
 

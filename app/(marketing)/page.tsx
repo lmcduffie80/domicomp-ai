@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Show } from "@clerk/nextjs";
+import { AdminNavLink } from "@/components/admin-nav-link";
 import {
   ArrowRight, BarChart3, Bot, Building2, Camera,
   CheckCircle2, ChevronRight, Clock, DollarSign, Home, MapPin,
@@ -131,6 +133,9 @@ export default function MarketingPage() {
               <Cta href="/sign-up" size="sm">Start free <ArrowRight className="ml-1 size-3.5" /></Cta>
             </Show>
             <Show when="signed-in">
+              <Suspense>
+                <AdminNavLink />
+              </Suspense>
               <Cta href="/app" size="sm">Open app <ArrowRight className="ml-1 size-3.5" /></Cta>
             </Show>
           </div>
@@ -280,7 +285,7 @@ export default function MarketingPage() {
             <Cta href="/sign-up" size="lg" className="bg-white text-[#0d1f17] hover:bg-white/90 shadow-lg gap-2">
               Get started today <ArrowRight className="size-4" />
             </Cta>
-            <p className="mt-3 text-xs text-emerald-300">No credit card required · 14-day free trial</p>
+            <p className="mt-3 text-xs text-emerald-300">No credit card required · 7-day free trial</p>
           </div>
         </div>
       </section>

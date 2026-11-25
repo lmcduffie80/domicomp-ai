@@ -5,24 +5,24 @@ const DAY = 86_400_000;
 const created = TRIAL_LAUNCH_MS + 3 * DAY;
 
 describe("trialEndsAt", () => {
-  it("ends 14 days after the org is created", () => {
-    expect(trialEndsAt(created)).toBe(created + 14 * DAY);
+  it("ends 7 days after the org is created", () => {
+    expect(trialEndsAt(created)).toBe(created + 7 * DAY);
   });
 
   it("gives orgs created before launch a full trial from launch day", () => {
-    expect(trialEndsAt(TRIAL_LAUNCH_MS - 90 * DAY)).toBe(TRIAL_LAUNCH_MS + 14 * DAY);
+    expect(trialEndsAt(TRIAL_LAUNCH_MS - 90 * DAY)).toBe(TRIAL_LAUNCH_MS + 7 * DAY);
   });
 
   it("uses an explicit trialStartedAt override when present", () => {
     const start = TRIAL_LAUNCH_MS - 30 * DAY;
-    expect(trialEndsAt(created, start)).toBe(start + 14 * DAY);
+    expect(trialEndsAt(created, start)).toBe(start + 7 * DAY);
   });
 });
 
 describe("isTrialActive", () => {
   const ends = trialEndsAt(created);
 
-  it("is active on day 1 and the last moment of day 14", () => {
+  it("is active on day 1 and the last moment of day 7", () => {
     expect(isTrialActive(ends, created)).toBe(true);
     expect(isTrialActive(ends, ends - 1)).toBe(true);
   });
@@ -36,8 +36,8 @@ describe("isTrialActive", () => {
 describe("trialDaysLeft", () => {
   const ends = trialEndsAt(created);
 
-  it("counts 14 days at the start", () => {
-    expect(trialDaysLeft(ends, created)).toBe(14);
+  it("counts 7 days at the start", () => {
+    expect(trialDaysLeft(ends, created)).toBe(7);
   });
 
   it("rounds a partial final day up to 1", () => {
