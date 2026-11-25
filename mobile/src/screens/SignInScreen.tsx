@@ -1,20 +1,28 @@
 import { useState } from "react";
 import { useClerk } from "@clerk/react";
 
-type Step = "email" | "code";
+type Step = "email" | "password" | "code";
+
+type SignInResult = { status: string; createdSessionId: string };
 
 // Minimal type for the sign-in client resource
 type ClerkSignIn = {
-  create: (p: { identifier: string }) => Promise<void>;
+  create: (p: { identifier: string }) => Promise<ClerkSignIn>;
   prepareFirstFactor: (p: { strategy: string; emailAddressId: string }) => Promise<void>;
-  attemptFirstFactor: (p: { strategy: string; code: string }) => Promise<{ status: string; createdSessionId: string }>;
-  supportedFirstFactors: Array<{ strategy: string; emailAddressId: string }> | null | undefined;
+  attemptFirstFactor: (p: { strategy: "email_code"; code: string } | { strategy: "password"; password: string }) => Promise<SignInResult>;
+  supportedFirstFactors: Array<{ strategy: string; emailAddressId?: string }> | null | undefined;
 };
+
+function errorMessage(e: unknown, fallback: string) {
+  const err = e as { errors?: { message: string; longMessage?: string }[]; message?: string };
+  return err.errors?.[0]?.longMessage ?? err.errors?.[0]?.message ?? err.message ?? fallback;
+}
 
 export function SignInScreen() {
   const clerk = useClerk();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,20 +32,61 @@ export function SignInScreen() {
     return (clerk as any).client?.signIn ?? null;
   }
 
-  async function handleSendCode() {
+  async function finish(result: SignInResult) {
+    if (result.status === "complete") {
+      await clerk.setActive({ session: result.createdSessionId });
+    } else {
+      setError("Additional verification is required. Use the emailed code instead.");
+    }
+  }
+
+  async function sendCode(si: ClerkSignIn) {
+    const factor = si.supportedFirstFactors?.find(f => f.strategy === "email_code");
+    if (factor?.emailAddressId) {
+      await si.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
+    }
+    setStep("code");
+  }
+
+  async function handleContinue() {
     const si = getSignIn();
     if (!si || !email.trim()) return;
     setLoading(true); setError(null);
     try {
-      await si.create({ identifier: email.trim() });
-      const factor = si.supportedFirstFactors?.find(f => f.strategy === "email_code");
-      if (factor) {
-        await si.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
+      const created = await si.create({ identifier: email.trim() });
+      if (created.supportedFirstFactors?.some(f => f.strategy === "password")) {
+        setStep("password");
+      } else {
+        await sendCode(created);
       }
-      setStep("code");
     } catch (e) {
-      const err = e as { errors?: { message: string }[]; message?: string };
-      setError(err.errors?.[0]?.message ?? err.message ?? "Something went wrong");
+      setError(errorMessage(e, "Something went wrong"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSendCode() {
+    const si = getSignIn();
+    if (!si) return;
+    setLoading(true); setError(null);
+    try {
+      await sendCode(si);
+    } catch (e) {
+      setError(errorMessage(e, "Could not send a code"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handlePassword() {
+    const si = getSignIn();
+    if (!si || !password) return;
+    setLoading(true); setError(null);
+    try {
+      await finish(await si.attemptFirstFactor({ strategy: "password", password }));
+    } catch (e) {
+      setError(errorMessage(e, "Incorrect password"));
     } finally {
       setLoading(false);
     }
@@ -48,16 +97,16 @@ export function SignInScreen() {
     if (!si || !code.trim()) return;
     setLoading(true); setError(null);
     try {
-      const result = await si.attemptFirstFactor({ strategy: "email_code", code: code.trim() });
-      if (result.status === "complete") {
-        await clerk.setActive({ session: result.createdSessionId });
-      }
+      await finish(await si.attemptFirstFactor({ strategy: "email_code", code: code.trim() }));
     } catch (e) {
-      const err = e as { errors?: { message: string }[]; message?: string };
-      setError(err.errors?.[0]?.message ?? err.message ?? "Invalid code");
+      setError(errorMessage(e, "Invalid code"));
     } finally {
       setLoading(false);
     }
+  }
+
+  function backToEmail() {
+    setStep("email"); setCode(""); setPassword(""); setError(null);
   }
 
   return (
@@ -81,7 +130,7 @@ export function SignInScreen() {
         {step === "email" ? (
           <>
             <h2 className="text-lg font-bold text-gray-900 mb-1">Sign in</h2>
-            <p className="text-sm text-gray-500 mb-6">We'll send a code to your email</p>
+            <p className="text-sm text-gray-500 mb-6">Enter the email you use for DomiComp AI</p>
 
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">Email address</label>
             <input
@@ -91,7 +140,7 @@ export function SignInScreen() {
               autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSendCode()}
+              onKeyDown={e => e.key === "Enter" && handleContinue()}
               onClick={e => (e.target as HTMLInputElement).focus()}
               placeholder="you@example.com"
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
@@ -100,19 +149,53 @@ export function SignInScreen() {
             {error && <p className="mt-3 text-xs text-red-500">{error}</p>}
 
             <button
-              onClick={handleSendCode}
+              onClick={handleContinue}
               disabled={loading || !email.trim()}
               className="mt-5 w-full rounded-xl bg-green-800 py-3.5 text-sm font-semibold text-white disabled:opacity-50 active:scale-95 transition-transform"
             >
-              {loading ? "Sending…" : "Continue →"}
+              {loading ? "Checking…" : "Continue →"}
+            </button>
+          </>
+        ) : step === "password" ? (
+          <>
+            <button onClick={backToEmail} className="mb-5 text-xs text-gray-400 flex items-center gap-1">
+              ← Back
+            </button>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Enter your password</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Signing in as <span className="font-medium text-gray-700">{email}</span>
+            </p>
+
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
+            <input
+              type="password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handlePassword()}
+              onClick={e => (e.target as HTMLInputElement).focus()}
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
+            />
+
+            {error && <p className="mt-3 text-xs text-red-500">{error}</p>}
+
+            <button
+              onClick={handlePassword}
+              disabled={loading || !password}
+              className="mt-5 w-full rounded-xl bg-green-800 py-3.5 text-sm font-semibold text-white disabled:opacity-50 active:scale-95 transition-transform"
+            >
+              {loading ? "Signing in…" : "Sign in →"}
+            </button>
+
+            <button onClick={handleSendCode} disabled={loading} className="mt-3 w-full text-xs text-gray-400 py-2">
+              Email me a code instead
             </button>
           </>
         ) : (
           <>
-            <button
-              onClick={() => { setStep("email"); setCode(""); setError(null); }}
-              className="mb-5 text-xs text-gray-400 flex items-center gap-1"
-            >
+            <button onClick={backToEmail} className="mb-5 text-xs text-gray-400 flex items-center gap-1">
               ← Back
             </button>
             <h2 className="text-lg font-bold text-gray-900 mb-1">Check your email</h2>
