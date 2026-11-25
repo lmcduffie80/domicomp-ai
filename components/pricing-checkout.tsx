@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 type Plan = "pro" | "team";
@@ -27,6 +28,7 @@ const PLANS = [
 ];
 
 export function PricingCheckout() {
+  const router = useRouter();
   const [loading, setLoading] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +41,10 @@ export function PricingCheckout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
       });
+      if (res.status === 401) {
+        router.push("/sign-in?redirect_url=/pricing");
+        return;
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Checkout failed");
       window.location.assign(data.url);

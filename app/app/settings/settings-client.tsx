@@ -10,12 +10,14 @@ const PLAN_LABELS: Record<string, string> = {
   pro: "Pro — $79/mo",
   team: "Team — $199/mo",
   founder: "Founder (Comped)",
+  trial: "Free trial",
 };
 
 const PLAN_COLORS: Record<string, string> = {
   pro: "bg-blue-50 text-blue-700 border-blue-100",
   team: "bg-emerald-50 text-emerald-700 border-emerald-100",
   founder: "bg-amber-50 text-amber-700 border-amber-100",
+  trial: "bg-slate-50 text-slate-700 border-slate-200",
 };
 
 export function SettingsClient({ plan, comped }: { plan: string; comped: boolean }) {

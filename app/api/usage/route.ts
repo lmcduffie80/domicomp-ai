@@ -11,5 +11,6 @@ export async function GET() {
     limit: access.entitlements.lookupsPerMonth,
     plan: access.entitlements.plan,
     comped: access.entitlements.comped,
+    trialEndsAt: access.entitlements.trialEndsAt,
   });
 }

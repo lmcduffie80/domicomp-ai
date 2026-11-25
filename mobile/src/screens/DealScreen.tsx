@@ -2,8 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useOrganization, useClerk } from "@clerk/react";
 import { Home, Camera, MapPinned, Hammer, Calculator, Plus, ChevronLeft, LogOut, Building2, Loader2 } from "lucide-react";
 import { useApi } from "@/lib/useApi";
-import { makeApi } from "@/lib/api";
+import { makeApi, SUBSCRIPTION_REQUIRED_EVENT } from "@/lib/api";
 import type { Deal } from "@/lib/schemas";
+import { PaywallScreen } from "./PaywallScreen";
 
 import { PropertyTab } from "./tabs/PropertyTab";
 import { PhotosTab }   from "./tabs/PhotosTab";
@@ -34,7 +35,15 @@ export function DealScreen() {
   const [view, setView]         = useState<"list" | "deal">("list");
   const [loading, setLoading]   = useState(true);
   const [listError, setListError] = useState<string | null>(null);
+  const [paywall, setPaywall]   = useState(false);
+  const [trialEndsAt, setTrialEndsAt] = useState<number | null>(null);
   const apiRef = useRef<ReturnType<typeof makeApi> | null>(null);
+
+  useEffect(() => {
+    const show = () => setPaywall(true);
+    window.addEventListener(SUBSCRIPTION_REQUIRED_EVENT, show);
+    return () => window.removeEventListener(SUBSCRIPTION_REQUIRED_EVENT, show);
+  }, []);
 
   /* Keep a live api instance so tabs can call it synchronously — only refresh when getApi changes */
   useEffect(() => {
@@ -63,13 +72,17 @@ export function DealScreen() {
     }
   }, [call]);
 
-  useEffect(() => {
+  const loadAll = useCallback(() => {
     setLoading(true);
+    setPaywall(false);
+    call(a => a.usage()).then(u => setTrialEndsAt(u.trialEndsAt ?? null)).catch(() => {});
     loadDeals().then(async (list) => {
       const best = list.find(d => d.address?.trim()) ?? list[0];
       if (best) await openDeal(best.id);
     }).finally(() => setLoading(false));
-  }, [loadDeals, openDeal]);
+  }, [call, loadDeals, openDeal]);
+
+  useEffect(() => { loadAll(); }, [loadAll]);
 
   async function newDeal() {
     const { deal: d } = await call(a => a.deals.create());
@@ -145,6 +158,8 @@ export function DealScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // attach once; tabRef keeps current tab value
 
+  if (paywall) return <PaywallScreen onRetry={loadAll} />;
+
   /* ─── Loading ──────────────────────────────────────── */
   if (loading) {
     return (
@@ -198,6 +213,15 @@ export function DealScreen() {
               <Plus className="size-4" /> New Deal
             </button>
           </div>
+
+          {trialEndsAt != null && (
+            <div className="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+              <p className="text-sm font-semibold text-emerald-900">
+                {Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86_400_000))} days left in your free trial
+              </p>
+              <p className="mt-0.5 text-xs text-emerald-800/80">Full access until {new Date(trialEndsAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}. No card needed until then.</p>
+            </div>
+          )}
 
           {listError && (
             <div className="mb-4 rounded-2xl bg-red-50 border border-red-100 p-4">

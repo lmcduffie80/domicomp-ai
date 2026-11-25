@@ -16,13 +16,19 @@ async function req<T>(path: string, token: string | null, init?: RequestInit): P
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || `HTTP ${res.status}`);
+    if (res.status === 402) window.dispatchEvent(new Event(SUBSCRIPTION_REQUIRED_EVENT));
+    let message = text;
+    try { message = (JSON.parse(text) as { error?: string }).error ?? text; } catch { /* plain-text body */ }
+    throw new Error(message || `HTTP ${res.status}`);
   }
   return res.json() as Promise<T>;
 }
 
+export const SUBSCRIPTION_REQUIRED_EVENT = "domicomp:subscription-required";
+export const SUBSCRIBE_URL = "https://domicomp-ai.com/sign-in?redirect_url=%2Fpricing%3Ftrial%3Dended";
+
 export type DealListItem = { id: string; address: string; updatedAt: number };
-export type Usage = { used: number; limit: number; plan: string; comped: boolean };
+export type Usage = { used: number; limit: number; plan: string; comped: boolean; trialEndsAt: number | null };
 
 export function makeApi(token: string | null) {
   const r = <T>(path: string, init?: RequestInit) => req<T>(path, token, init);
