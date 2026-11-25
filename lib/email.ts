@@ -310,6 +310,71 @@ export async function sendSubscriptionConfirmedEmail({ to, firstName, plan, orgN
   });
 }
 
+const SUPPORT_FORWARD_TO = (process.env.SUPPORT_FORWARD_TO ?? "lee@innovative-cc.com")
+  .split(",")
+  .map((e) => e.trim())
+  .filter(Boolean);
+
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** Verifies a Resend webhook signature and returns the parsed event. Throws if invalid. */
+export function verifyResendWebhook(payload: string, headers: Headers) {
+  const secret = process.env.RESEND_WEBHOOK_SECRET;
+  if (!secret) throw new Error("RESEND_WEBHOOK_SECRET is not set");
+  return resendClient().webhooks.verify({
+    payload,
+    webhookSecret: secret,
+    headers: {
+      id: headers.get("svix-id") ?? headers.get("webhook-id") ?? "",
+      timestamp: headers.get("svix-timestamp") ?? headers.get("webhook-timestamp") ?? "",
+      signature: headers.get("svix-signature") ?? headers.get("webhook-signature") ?? "",
+    },
+  });
+}
+
+/**
+ * Forwards an email received at any @domicomp-ai.com address (e.g. support@) to the
+ * team inbox, with Reply-To set to the original sender so replies go straight back to them.
+ */
+export async function forwardInboundEmail(emailId: string) {
+  const resend = resendClient();
+  const { data: email, error } = await resend.emails.receiving.get(emailId);
+  if (error || !email) return { data: null, error: error ?? new Error("Received email not found") };
+
+  if (email.from.toLowerCase().includes(FROM_ADDRESS.toLowerCase())) {
+    return { data: null, error: null, skipped: "own address" as const };
+  }
+
+  const subject = email.subject || "(no subject)";
+  const replyTo = email.reply_to?.[0] ?? email.from;
+  const attachmentNames = email.attachments.map((a) => a.filename ?? "attachment");
+  const header = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+  <strong style="color:#0f172a">Received at ${escapeHtml(email.to.join(", "))}</strong><br/>
+  From: ${escapeHtml(email.from)}<br/>
+  Date: ${escapeHtml(new Date(email.created_at).toUTCString())}${
+    attachmentNames.length
+      ? `<br/>Attachments (open in the Resend dashboard under Receiving): ${escapeHtml(attachmentNames.join(", "))}`
+      : ""
+  }<br/>
+  Hit Reply to answer the sender directly.
+</div>`;
+  const body = email.html ?? `<pre style="white-space:pre-wrap;font-family:inherit">${escapeHtml(email.text ?? "")}</pre>`;
+
+  return resend.emails.send(
+    {
+      from: `DomiComp AI Support <${FROM_ADDRESS}>`,
+      to: SUPPORT_FORWARD_TO,
+      replyTo,
+      subject: `[Support] ${subject}`,
+      html: header + body,
+      text: `Received at ${email.to.join(", ")}\nFrom: ${email.from}\n\n${email.text ?? ""}`,
+    },
+    { idempotencyKey: `inbound-forward-${email.id}` },
+  );
+}
+
 /** Re-delivers any Clerk email event through Resend (invitation, verification, etc.). */
 export async function forwardClerkEmail(opts: {
   to: string;

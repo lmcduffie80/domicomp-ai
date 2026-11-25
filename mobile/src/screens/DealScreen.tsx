@@ -6,6 +6,7 @@ import { makeApi, SUBSCRIPTION_REQUIRED_EVENT } from "@/lib/api";
 import type { Deal } from "@/lib/schemas";
 import { PaywallScreen } from "./PaywallScreen";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { DeleteDealButton } from "@/components/DeleteDealButton";
 
 import { PropertyTab } from "./tabs/PropertyTab";
 import { PhotosTab }   from "./tabs/PhotosTab";
@@ -97,6 +98,13 @@ export function DealScreen() {
   async function saveDeal(updated: Deal) {
     setDeal(updated);
     await call(a => a.deals.save(updated));
+    await loadDeals();
+  }
+
+  async function handleDealDeleted() {
+    setDeal(null);
+    setPhotoUrls({});
+    setView("list");
     await loadDeals();
   }
 
@@ -340,6 +348,9 @@ export function DealScreen() {
             </p>
             <p className="text-xs text-emerald-400 mt-0.5">{organization?.name}</p>
           </div>
+          {deal && (
+            <DeleteDealButton dealId={deal.id} address={deal.address} onDeleted={handleDealDeleted} />
+          )}
           {membership?.role === "org:admin" && (
             <button
               onClick={newDeal}

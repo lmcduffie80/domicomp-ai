@@ -1,4 +1,5 @@
 import "server-only";
+import { del, list } from "@vercel/blob";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { deals, photos } from "@/lib/db/schema";
@@ -98,6 +99,18 @@ export async function deleteDeal(orgId: string, id: string) {
   const db = getDb();
   await db.delete(photos).where(and(eq(photos.orgId, orgId), eq(photos.dealId, id)));
   await db.delete(deals).where(and(eq(deals.orgId, orgId), eq(deals.id, id)));
+  await deleteDealPhotoFiles(orgId, id);
+}
+
+async function deleteDealPhotoFiles(orgId: string, dealId: string) {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) return;
+  let cursor: string | undefined;
+  do {
+    const page = await list({ prefix: `orgs/${orgId}/deals/${dealId}/`, cursor, token });
+    if (page.blobs.length) await del(page.blobs.map((b) => b.url), { token });
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
 }
 
 export async function addPhoto(orgId: string, dealId: string, room: string, url: string) {
