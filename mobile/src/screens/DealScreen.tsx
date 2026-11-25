@@ -162,8 +162,8 @@ export function DealScreen() {
     return (
       <div className="flex min-h-screen flex-col bg-slate-50">
         {/* Header */}
-        <div className="bg-[#0d1f17] px-4 pb-6 pt-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-[#0d1f17] px-4 pb-6 pt-4 md:px-8 md:pb-8 md:pt-6">
+          <div className="mx-auto flex max-w-4xl items-center justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">DomiComp AI</p>
               <h1 className="text-xl font-bold text-white mt-0.5">{organization?.name ?? "My Organization"}</h1>
@@ -188,7 +188,7 @@ export function DealScreen() {
         </div>
 
         {/* Deals list */}
-        <div className="flex-1 px-4 py-5">
+        <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-5 md:px-8 md:py-8">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold text-slate-700 text-base">Your Deals</h2>
             <button
@@ -225,7 +225,7 @@ export function DealScreen() {
           )}
 
           {!listError && deals.length > 0 && (
-            <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {deals.map((d, i) => (
                 <button
                   key={d.id}
@@ -256,20 +256,53 @@ export function DealScreen() {
   const api = apiRef.current ?? makeApi(null);
 
   return (
-    <div className="flex flex-col bg-slate-50" style={{ minHeight: "100dvh" }}>
+    <div className="flex min-h-dvh bg-slate-50 md:h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] md:min-h-0 md:overflow-hidden">
+      {/* iPad sidebar */}
+      <aside className="hidden w-60 shrink-0 flex-col bg-[#0d1f17] px-3 py-5 md:flex">
+        <p className="px-3 text-xs font-semibold uppercase tracking-widest text-emerald-400">DomiComp AI</p>
+        <p className="mt-0.5 truncate px-3 text-sm font-semibold text-white">{organization?.name}</p>
+        <button
+          onClick={() => setView("list")}
+          className="mt-6 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-emerald-300 active:bg-white/10"
+        >
+          <ChevronLeft className="size-4" /> All Deals
+        </button>
+        <nav className="mt-2 grid gap-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                tab === t.id ? "bg-white/15 text-white" : "text-emerald-200/70 active:bg-white/10"
+              }`}
+            >
+              <t.icon className={`size-5 ${tab === t.id ? "stroke-[2.5]" : ""}`} />
+              {t.label}
+            </button>
+          ))}
+        </nav>
+        <button
+          onClick={() => signOut()}
+          className="mt-auto flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-emerald-400 active:bg-white/10"
+        >
+          <LogOut className="size-4" /> Sign out
+        </button>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col md:overflow-y-auto">
       {/* Deal header */}
-      <div className="bg-[#0d1f17] px-4 pb-3 pt-4 shrink-0">
+      <div className="bg-[#0d1f17] px-4 pb-3 pt-4 shrink-0 md:px-8 md:py-5">
         {/* Back row */}
         <button
           onClick={() => setView("list")}
-          className="flex items-center gap-1 text-emerald-400 active:opacity-70 mb-2"
+          className="flex items-center gap-1 text-emerald-400 active:opacity-70 mb-2 md:hidden"
         >
           <ChevronLeft className="size-4" />
           <span className="text-xs font-semibold uppercase tracking-wide">All Deals</span>
         </button>
-        <div className="flex items-center gap-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="truncate font-bold text-white text-base leading-tight">
+            <p className="truncate font-bold text-white text-base leading-tight md:text-xl">
               {deal?.address || "Untitled deal"}
             </p>
             <p className="text-xs text-emerald-400 mt-0.5">{organization?.name}</p>
@@ -290,8 +323,7 @@ export function DealScreen() {
       {/* Tab content — swipeable */}
       <div
         ref={swipeRef}
-        className={`flex-1 overflow-y-auto ${tab === "summary" ? "flex flex-col" : ""}`}
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 64px)" }}
+        className={`mx-auto w-full max-w-3xl flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+64px)] md:px-4 md:pb-10 md:pt-4 ${tab === "summary" ? "flex flex-col" : ""}`}
       >
         {deal && tab === "property" && (
           <PropertyTab deal={deal} photoUrls={photoUrls} onChange={handleChange} onSave={saveDeal} api={api} />
@@ -310,9 +342,11 @@ export function DealScreen() {
         )}
       </div>
 
+      </div>
+
       {/* Bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-gray-100 bg-white/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-gray-100 bg-white/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {TABS.map((t) => (

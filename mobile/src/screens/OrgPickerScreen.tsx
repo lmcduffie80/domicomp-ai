@@ -11,7 +11,7 @@ export function OrgPickerScreen() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#0d1f17] px-4 py-12">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-[#0d1f17] px-4 py-12 md:justify-center">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-white">Choose a workspace</h1>
         <p className="mt-1 text-sm text-emerald-300">Select the organization you want to work in</p>

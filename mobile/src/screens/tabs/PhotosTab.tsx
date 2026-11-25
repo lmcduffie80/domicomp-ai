@@ -165,7 +165,7 @@ export function PhotosTab({ deal, photoUrls, onChange, onSave, api }: Props) {
       {ROOMS.filter(r => grouped[r]?.length > 0).map(r => (
         <div key={r}>
           <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{r}</p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-4">
             {grouped[r].map(photo => (
               <div key={photo.id} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
                 {photoUrls[photo.id] ? (

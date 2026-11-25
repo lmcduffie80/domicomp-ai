@@ -202,7 +202,7 @@ export function RehabTab({ deal, onChange, onSave, api }: Props) {
                           onClick={() => handleQuantityChange(line.id, Math.max(1, line.quantity - 1))}
                           className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center text-gray-500"
                         >−</button>
-                        <span className="text-sm font-medium w-8 text-center">{line.quantity} {line.unit}</span>
+                        <span className="min-w-8 whitespace-nowrap px-1 text-center text-sm font-medium">{line.quantity} {line.unit}</span>
                         <button
                           onClick={() => handleQuantityChange(line.id, line.quantity + 1)}
                           className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center text-gray-500"
