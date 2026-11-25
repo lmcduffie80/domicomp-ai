@@ -5,6 +5,7 @@ import { useApi } from "@/lib/useApi";
 import { makeApi, SUBSCRIPTION_REQUIRED_EVENT } from "@/lib/api";
 import type { Deal } from "@/lib/schemas";
 import { PaywallScreen } from "./PaywallScreen";
+import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 
 import { PropertyTab } from "./tabs/PropertyTab";
 import { PhotosTab }   from "./tabs/PhotosTab";
@@ -271,6 +272,13 @@ export function DealScreen() {
               ))}
             </div>
           )}
+
+          <div className="mt-10 flex justify-center gap-6 border-t border-slate-200 pt-5 text-sm">
+            <button onClick={() => signOut()} className="flex items-center gap-1.5 text-slate-500">
+              <LogOut className="size-4" /> Sign out
+            </button>
+            <DeleteAccountButton className="text-red-600" />
+          </div>
         </div>
       </div>
     );
@@ -311,6 +319,7 @@ export function DealScreen() {
         >
           <LogOut className="size-4" /> Sign out
         </button>
+        <DeleteAccountButton className="rounded-xl px-3 py-2.5 text-sm text-red-300 active:bg-white/10" />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col md:overflow-y-auto">

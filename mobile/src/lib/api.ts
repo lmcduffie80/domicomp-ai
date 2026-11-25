@@ -43,6 +43,9 @@ export function makeApi(token: string | null) {
       delete: (id: string) => r(`/api/deals?id=${id}`, { method: "DELETE" }),
     },
     usage: () => r<Usage>("/api/usage"),
+    account: {
+      delete: () => r<{ deleted: true }>("/api/account", { method: "DELETE" }),
+    },
     property: (address: string) => r<{ property: unknown; avm: unknown; comps: unknown[] }>(`/api/property`, { method: "POST", body: JSON.stringify({ address }) }),
     compAnalysis: (body: unknown) => post<CompAnalysis>("/api/comp-analysis", body),
     rehabPricing: (body: unknown) => post<{ items: PricedItem[]; checkedAt: string }>("/api/rehab-pricing", body),

@@ -1,5 +1,6 @@
 import { useUser, useClerk } from "@clerk/react";
 import { Building2, LogOut } from "lucide-react";
+import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 
 export function OrgPickerScreen() {
   const { user } = useUser();
@@ -42,12 +43,12 @@ export function OrgPickerScreen() {
         )}
       </div>
 
-      <button
-        onClick={() => signOut()}
-        className="mt-auto flex items-center justify-center gap-2 pt-8 text-sm text-emerald-400"
-      >
-        <LogOut className="size-4" /> Sign out
-      </button>
+      <div className="mt-auto flex justify-center gap-6 pt-8 text-sm">
+        <button onClick={() => signOut()} className="flex items-center gap-2 text-emerald-400">
+          <LogOut className="size-4" /> Sign out
+        </button>
+        <DeleteAccountButton className="text-red-300" />
+      </div>
     </div>
   );
 }

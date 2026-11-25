@@ -1,6 +1,7 @@
 import { useClerk, useOrganization } from "@clerk/react";
 import { Building2, ExternalLink, LogOut, RefreshCw } from "lucide-react";
 import { SUBSCRIBE_URL } from "@/lib/api";
+import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 
 export function PaywallScreen({ onRetry }: { onRetry: () => void }) {
   const { organization } = useOrganization();
@@ -45,6 +46,9 @@ export function PaywallScreen({ onRetry }: { onRetry: () => void }) {
           <button onClick={() => signOut()} className="flex items-center gap-1.5">
             <LogOut className="size-4" /> Sign out
           </button>
+        </div>
+        <div className="mt-4 flex justify-center text-sm">
+          <DeleteAccountButton className="text-red-300" />
         </div>
       </div>
     </div>
